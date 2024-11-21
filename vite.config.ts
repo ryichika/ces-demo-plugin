@@ -15,12 +15,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const dir = __dirname;
 
-/**
- * List any third-party dependencies that should be bundled into the plugin.
- * You can either use regex or package names.
- */
-const myThirdPartyDependencies = ["lodash"];
-
 export default defineConfig(dir, {
   buildConfigOverride: { sourcemap: true },
   forceBundleDependencies: thirdPartyDependencies,
