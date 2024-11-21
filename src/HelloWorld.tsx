@@ -1,13 +1,17 @@
 import { Button } from "@fiftyone/components";
-import { executeOperator, registerOperator } from "@fiftyone/operators";
+import {
+  executeOperator,
+  Operator,
+  OperatorConfig,
+  registerOperator,
+} from "@fiftyone/operators";
 import * as fos from "@fiftyone/state";
-import { useCallback, useMemo } from "react";
-import { useRecoilValue } from "recoil";
-import { AlertOperator } from "./operators/AlertOperator";
-
+import { colors, Typography } from "@mui/material";
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
 import { TreeItem } from "@mui/x-tree-view/TreeItem";
-
+import _ from "lodash";
+import { useCallback, useMemo } from "react";
+import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -18,19 +22,32 @@ const Container = styled.div`
 `;
 
 export function HelloWorld() {
-  registerOperator(AlertOperator, "@voxel51/hello-world");
-  const onClickAlert = useCallback(() => executeOperator("@voxel51/hello-world/show_alert"), []);
-  const dataset: any = useRecoilValue(fos.dataset);
+  const onClickAlert = useCallback(
+    () => executeOperator("@voxel51/hello-world/show_alert"),
+    []
+  );
+  const dataset = useRecoilValue(fos.dataset);
+
+  const concatResult = useMemo(() => {
+    const caption = _.concat(["Life gave us lemons,"], "so we concat 🍋").join(
+      " "
+    );
+    return caption;
+  }, []);
 
   return (
-    <>
-      <h1>Hello, world (CES)</h1>
-      <h2>
-        You are viewing the <strong>{dataset?.name}</strong> dataset
-      </h2>
-      <Button onClick={onClickAlert}>Show alert</Button>
+    <Container>
+      <Typography variant="h3" color={colors.blueGrey[500]}>
+        Hello, world!
+      </Typography>
+      <Typography color={colors.deepOrange[700]}>
+        You are viewing the <em>{dataset?.name}</em> dataset
+      </Typography>
+      <Typography variant="caption">{concatResult}</Typography>
+      <Button onClick={onClickAlert} style={{ width: "200px" }}>
+        Show alert
+      </Button>
 
-      {/* TreeView Sample */}
       <SimpleTreeView>
         <TreeItem itemId="grid" label="Data Grid">
           <TreeItem itemId="grid-community" label="@mui/x-data-grid" />
@@ -48,7 +65,21 @@ export function HelloWorld() {
           <TreeItem itemId="tree-view-community" label="@mui/x-tree-view" />
         </TreeItem>
       </SimpleTreeView>
-    </>
-
+    </Container>
   );
 }
+
+class AlertOperator extends Operator {
+  get config() {
+    return new OperatorConfig({
+      name: "show_alert",
+      label: "Show alert",
+      unlisted: true,
+    });
+  }
+  async execute() {
+    alert(`Hello from plugin ${this.pluginName}`);
+  }
+}
+
+registerOperator(AlertOperator, "@voxel51/hello-world");

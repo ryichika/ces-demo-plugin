@@ -1,4 +1,4 @@
-name: "@voxel51/hello-world"
+name: "@microsoft/ces-demo-plugin"
 description: An example of a simple FiftyOne Javascript plugin
 version: 1.0.0
 fiftyone:

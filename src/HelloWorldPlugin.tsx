@@ -2,7 +2,7 @@ import { PluginComponentType, registerComponent } from "@fiftyone/plugins";
 import { HelloWorld } from "./HelloWorld";
 
 registerComponent({
-  name: "HelloWorld",
+  name: "ces_demo_panel",
   label: "Hello world (CES)",
   component: HelloWorld,
   type: PluginComponentType.Panel,
