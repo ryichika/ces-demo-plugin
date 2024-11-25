@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Hello World JS Plugin for FiftyOne",
   "type": "module",
-  "main": "src/HelloWorldPlugin.tsx",
+  "main": "src/TaxonomyPlugin.tsx",
   "fiftyone": {
     "script": "dist/index.umd.js"
   },
@@ -26,8 +26,11 @@
     "@fiftyone/state": "portal:../fiftyone/app/packages/state",
     "@fiftyone/utilities": "portal:../fiftyone/app/packages/utilities",
     "@mui/x-tree-view": "^7.22.1",
+    "axios": "^1.7.7",
+    "jotai": "^2.10.3",
     "lodash": "^4.17.21",
     "motion": "^11.11.17",
+    "nodemon": "^3.1.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "recoil": "^0.7.7",

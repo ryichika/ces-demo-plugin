@@ -13,3 +13,5 @@ export class AlertOperator extends Operator {
     alert(`Ryuta, Hello from plugin ${this.pluginName}`);
   }
 }
+
+registerOperator(AlertOperator, "@voxel51/hello-world");

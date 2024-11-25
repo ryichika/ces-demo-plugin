@@ -1,10 +1,10 @@
 import { PluginComponentType, registerComponent } from "@fiftyone/plugins";
-import { HelloWorld } from "./HelloWorld";
+import Taxonomy from "@/components/Taxonomy";
 
 registerComponent({
-  name: "ces_demo_panel",
-  label: "Hello world (CES)",
-  component: HelloWorld,
+  name: "taxonomy_tree",
+  label: "Taxonomy Tree",
+  component: Taxonomy,
   type: PluginComponentType.Panel,
   activator: myActivator,
   panelOptions: {
@@ -12,7 +12,7 @@ registerComponent({
   },
 });
 
-function myActivator({ dataset }) {
+function myActivator({ dataset }: any) {
   // Example of activating the plugin in a particular context
   // return dataset.name === 'quickstart'
 

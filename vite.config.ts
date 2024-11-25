@@ -8,4 +8,11 @@ const dir = __dirname;
 
 export default defineConfig(dir, {
   buildConfigOverride: { sourcemap: true },
+  vite: {
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+      },
+    },
+  },
 });
