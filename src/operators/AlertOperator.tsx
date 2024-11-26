@@ -14,4 +14,4 @@ export class AlertOperator extends Operator {
   }
 }
 
-registerOperator(AlertOperator, "@voxel51/hello-world");
+// registerOperator(AlertOperator, "@voxel51/hello-world");

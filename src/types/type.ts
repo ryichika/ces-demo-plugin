@@ -1,3 +1,10 @@
+export type TaxonomyItem = {
+  id: string;
+  label: string;
+  count: number;
+  sourceData?: TaxonomyData;
+  children?: TaxonomyItem[];
+};
 
 export type TaxonomyData = {
   category: string;
@@ -5,14 +12,6 @@ export type TaxonomyData = {
   tagName: string;
   tagValue: string;
   count: number;
-};
-
-export type TaxonomyItem = {
-  id: number;
-  label: string;
-  count: number;
-  sourceData?: TaxonomyData;
-  children?: TaxonomyItem[];
 };
 
 export type AggregatedResult = {

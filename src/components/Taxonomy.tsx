@@ -5,220 +5,173 @@ import { useAtom, useAtomValue } from "jotai";
 import { colors, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { RichTreeView } from "@mui/x-tree-view/RichTreeView";
-import { TreeViewBaseItem } from "@mui/x-tree-view/models";
-import { TreeItem } from "@mui/x-tree-view/TreeItem";
 
-import { executeOperator, Operator, OperatorConfig, registerOperator } from "@fiftyone/operators";
+import { registerOperator, useOperatorExecutor } from "@fiftyone/operators";
+import { TaxonomyOperator } from "@/operators/TaxonomyOperator";
+
 import * as fos from "@fiftyone/state";
 // import { Button } from "@fiftyone/components";
 
-import httpClient from "@/utils/httpClient";
-import { itemsState, selectedTaxonomiesState, itemIdState } from "@/atoms/taxonomyAtom";
+// import { itemsState, selectedTaxonomiesState, globalItemIdState } from "@/atoms/taxonomyAtom";
 import { TaxonomyData, TaxonomyItem, AggregatedResult } from "@/types/type";
 
 import styled from "styled-components";
+import style from "./style.module.css";
 import _ from "lodash";
 
-const MUI_X_PRODUCTS: TreeViewBaseItem[] = [
-  {
-    id: "grid",
-    label: "Data Grid",
-    children: [
-      { id: "grid-community", label: "@mui/x-data-grid" },
-      { id: "grid-pro", label: "@mui/x-data-grid-pro" },
-      { id: "grid-premium", label: "@mui/x-data-grid-premium" },
-    ],
-  },
-  {
-    id: "pickers",
-    label: "Date and Time Pickers",
-    children: [
-      { id: "pickers-community", label: "@mui/x-date-pickers" },
-      { id: "pickers-pro", label: "@mui/x-date-pickers-pro" },
-    ],
-  },
-  {
-    id: "charts",
-    label: "Charts",
-    children: [{ id: "charts-community", label: "@mui/x-charts" }],
-  },
-  {
-    id: "tree-view",
-    label: "Tree View",
-    children: [{ id: "tree-view-community", label: "@mui/x-tree-view" }],
-  },
-];
-
-const Container = styled.div`
-  margin: 1em;
-  display: flex;
-  flex-direction: column;
-  row-gap: 0.25em;
-`;
-
-async function setTaxonomyData() {
-  const formData = new FormData();
-  formData.append("startDate", "");
-  formData.append("endDate", "");
-  formData.append("targetTable", "tag_table_EmbeddedImages_v6_Updated_NT_2");
-  const response = await httpClient.post("/v1/SummarizedTaxonomy", formData);
-
-  const sortedData = response.data.sort((a: any, b: any) => {
-    const categoryComparison = a.category.localeCompare(b.category);
-    if (categoryComparison !== 0) return categoryComparison;
-
-    const taxonomyComparison = a.taxonomy.localeCompare(b.taxonomy);
-    if (taxonomyComparison !== 0) return taxonomyComparison;
-
-    return a.tagName.localeCompare(b.tagName);
-  });
-
-  // 静的空間データ設定
-  setSceneryElements(sortedData);
-}
-
-// 静的空間データ
-function setSceneryElements(sortedData: any) {
-  const [items, setItems] = useAtom(itemsState);
-  const [itemId, setItemId] = useAtom(itemIdState);
-
-  const groupedCategoryS1 = _.filter(sortedData, function (data: TaxonomyData) {
-    return data.category === "Drivable area";
-  });
-  
-  const resultL1 = createTreeView(groupedCategoryS1);
-  console.log("resultL1", resultL1);
-
-  const newItemL1: TaxonomyItem = {
-    id: itemId,
-    label: "Drivable area",
-    count: resultL1.totalCount,
-    children: resultL1.result,
-    sourceData: {
-      category: "Drivable area",
-      taxonomy: "",
-      tagName: "",
-      tagValue: "",
-      count: resultL1.totalCount,
-    },
-  };
-  setItemId((prevId) => prevId + 1);
-  setItems((prevItems) => [...prevItems, newItemL1]);
-}
-
-function createTreeView(groupedCategory: any, category?: string): AggregatedResult {
-  const [itemId, setItemId] = useAtom(itemIdState);
-
-  let totalCount = 0;
-  let result: TaxonomyItem[] = [];
-
-  // Taxonomyでグループ化 (第1階層)
-  const groupedData = _.groupBy<TaxonomyData[]>(groupedCategory, function (data: TaxonomyData) {
-    return data.taxonomy;
-  });
-  Object.getOwnPropertyNames(groupedData).forEach((key, index) => {
-    const children = groupedData[key];
-    const newItem: TaxonomyItem = {
-      id: itemId,
-      label: key,
-      count: children.reduce((acc: any, cur: any) => acc + cur.count, 0),
-      children: [],
-      sourceData: {
-        category: groupedCategory[0].category,
-        taxonomy: key,
-        tagName: "",
-        tagValue: "",
-        count: children.reduce((acc: any, cur: any) => acc + cur.count, 0),
-      },
-    };
-    setItemId((prevId) => prevId + 1);
-
-    // tagNameでグループ化 (第2階層)
-    const groupedData2 = _.groupBy(children, function (data: TaxonomyData) {
-      return data.tagName;
-    });
-    Object.getOwnPropertyNames(groupedData2).forEach((key2) => {
-      const children2 = groupedData2[key2];
-      // tagNameがない場合はノードに追加しない
-      // ※ tagNameがない場合はgroupbyによってundefinedという名前のプロパティができる
-      if (key2 === "undefined") return;
-
-      newItem.children?.push({
-        id: itemId,
-        label: key2,
-        count: children2.reduce((acc: any, cur: any) => acc + cur.count, 0),
-        children: [],
-        sourceData: {
-          category: groupedCategory[0].category,
-          taxonomy: key,
-          tagName: key2,
-          tagValue: "",
-          count: children.reduce((acc: any, cur: any) => acc + cur.count, 0),
-        },
-      });
-      setItemId((prevId) => prevId + 1);
-
-      // tagValueでグループ化 (第3階層)
-      const tagValues = _.filter(children2, function (child2: any) {
-        return child2.tagName === key2;
-      });
-      tagValues.forEach((tagValue: any) => {
-        // tagValueがない場合はノードに追加しない
-        if (!tagValue.hasOwnProperty("tagValue")) return;
-
-        newItem.children![newItem.children!.length - 1].children?.push({
-          id: itemId,
-          label: tagValue.tagValue,
-          count: tagValue.count,
-          sourceData: {
-            category: tagValue.category,
-            taxonomy: tagValue.taxonomy,
-            tagName: tagValue.tagName,
-            tagValue: tagValue.tagValue,
-            count: tagValue.count,
-          },
-        });
-        setItemId((prevId) => prevId + 1);
-      });
-    });
-
-    result.push(newItem);
-    totalCount += newItem.count;
-  });
-
-  const aggregatedResult: AggregatedResult = { result, totalCount };
-
-  return aggregatedResult;
-}
-
 function Taxonomy() {
-  const items = useAtomValue(itemsState);
-  const dataset = useRecoilState(fos.dataset) as any;
+  const [treeItems1, settreeItems1] = useState([] as TaxonomyItem[]);
+  const [treeItems2, settreeItems2] = useState([] as TaxonomyItem[]);
+  const [treeItems3, settreeItems3] = useState([] as TaxonomyItem[]);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const executor = useOperatorExecutor("@voxel51/taxonomy_plugin/create_taxonomy");
+  // const dataset = useRecoilState(fos.dataset) as any;
+
+  const Container = styled.div`
+    padding: 20px 0;
+    display: flex;
+    justify-content: center;
+  `;
+
+  const DetailPanelContent = styled.div`
+    overflow-y: auto;
+    overflow-x: hidden;
+    color: #c0c0c0;
+    margin-bottom: 20px;
+    height: 100%;
+    width: 90%;
+  `;
+
+  const DetailPanelContentTree = styled.div`
+    position: relative;
+  `;
+
+  const DetailPanelContentTreeBoxHeader = styled.div`
+    font-size: 1.1rem;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #c0c0c0;
+  `;
+
+  const DetailPanelContentTreeBoxes = styled.div`
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    overflow-y: hidden;
+  `;
+
+  const DetailPanelContentTreeBox = styled.div`
+    width: 32.8%;
+    overflow-y: hidden;
+    height: calc(100vh - 320px);
+  `;
 
   useEffect(() => {
-    try {
-      setTaxonomyData();
-    } catch (error) {
-      console.error(error);
-    }
-  });
+    const fetchData = async () => {
+      let items1 = [] as TaxonomyItem[];
+      let items2 = [] as TaxonomyItem[];
+      let items3 = [] as TaxonomyItem[];
+      await executor.execute({ items1, items2, items3 });
 
-  // const onClickAlert = useCallback(
-  //   () => executeOperator("@voxel51/hello-world/show_alert"),
-  //   []
-  // );
+      settreeItems1(items1);
+      settreeItems2(items2);
+      settreeItems3(items3);
+      console.log(style);
+    };
+
+    fetchData();
+  }, []);
+
+  const handleSelectedItemsChange = (event: React.SyntheticEvent, ids: string[]) => {
+    console.log(ids);
+  };
 
   return (
     <Container>
-      <Typography color={colors.deepOrange[700]}>
-        You are viewing the <em>{dataset[0].name}</em> dataset
-      </Typography>
-
-      <Box sx={{ minHeight: 352, minWidth: 290 }}>
-        <RichTreeView checkboxSelection items={MUI_X_PRODUCTS} />
-      </Box>
+      <DetailPanelContent>
+        <DetailPanelContentTree>
+          <DetailPanelContentTreeBoxHeader
+            style={{
+              width: "200px",
+              margin: "0 auto",
+              textAlign: "center",
+              paddingTop: "2px",
+              border: "1px solid #c0c0c0",
+            }}
+          >
+            Driving Situation
+          </DetailPanelContentTreeBoxHeader>
+          <div
+            style={{ borderLeft: "1px solid #c0c0c0", height: "28px", position: "absolute", left: "50%", top: "29px" }}
+          ></div>
+          <div
+            style={{ borderLeft: "1px solid #c0c0c0", height: "14px", position: "absolute", left: "16%", top: "40px" }}
+          ></div>
+          <div
+            style={{ borderLeft: "1px solid #c0c0c0", height: "14px", position: "absolute", left: "84%", top: "40px" }}
+          ></div>
+          <div
+            style={{
+              borderBottom: "1px solid white",
+              height: "1px",
+              width: "34%",
+              position: "absolute",
+              left: "16%",
+              top: "40px",
+            }}
+          ></div>
+          <div
+            style={{
+              borderBottom: "1px solid white",
+              height: "1px",
+              width: "34%",
+              position: "absolute",
+              left: "50%",
+              top: "40px",
+            }}
+          ></div>
+          <DetailPanelContentTreeBoxes>
+            <DetailPanelContentTreeBox>
+              <DetailPanelContentTreeBoxHeader>Scenery Elements</DetailPanelContentTreeBoxHeader>
+              {treeItems1.length && (
+                <RichTreeView
+                  multiSelect
+                  checkboxSelection
+                  items={treeItems1}
+                  onSelectedItemsChange={handleSelectedItemsChange}
+                />
+              )}
+            </DetailPanelContentTreeBox>
+            <DetailPanelContentTreeBox>
+              <DetailPanelContentTreeBoxHeader>Environmental Condition</DetailPanelContentTreeBoxHeader>
+              {treeItems2.length && (
+                <RichTreeView
+                  multiSelect
+                  checkboxSelection
+                  items={treeItems2}
+                  onSelectedItemsChange={handleSelectedItemsChange}
+                />
+              )}
+            </DetailPanelContentTreeBox>
+            <DetailPanelContentTreeBox>
+              <DetailPanelContentTreeBoxHeader>Dynamic Elements</DetailPanelContentTreeBoxHeader>
+              {treeItems3.length && (
+                <RichTreeView
+                  multiSelect
+                  checkboxSelection
+                  items={treeItems3}
+                  onSelectedItemsChange={handleSelectedItemsChange}
+                />
+              )}
+            </DetailPanelContentTreeBox>
+          </DetailPanelContentTreeBoxes>
+        </DetailPanelContentTree>
+      </DetailPanelContent>
     </Container>
   );
 }
 
 export default Taxonomy;
+
+registerOperator(TaxonomyOperator, "@voxel51/taxonomy_plugin");

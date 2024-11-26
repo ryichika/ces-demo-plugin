@@ -7,3 +7,4 @@ url: https://github.com/voxel51/hello-world-plugin-js
 license: Apache 2.0
 operators:
   - show_alert
+  - create_taxonomy
