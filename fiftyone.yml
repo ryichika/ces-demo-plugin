@@ -1,10 +1,12 @@
-name: "@microsoft/ces-demo-plugin"
-description: An example of a simple FiftyOne Javascript plugin
+name: "@voxel51/taxonomy_plugin"
+description: FiftyOne Javascript plugin for CES demo
 version: 1.0.0
 fiftyone:
   version: "*"
 url: https://github.com/voxel51/hello-world-plugin-js
 license: Apache 2.0
 operators:
-  - show_alert
   - create_taxonomy
+  - count_samples
+panels:
+  - hello_world_panel

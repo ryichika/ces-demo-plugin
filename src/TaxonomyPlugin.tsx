@@ -2,8 +2,8 @@ import { PluginComponentType, registerComponent } from "@fiftyone/plugins";
 import Taxonomy from "@/components/Taxonomy";
 
 registerComponent({
-  name: "taxonomy_tree",
-  label: "Taxonomy Tree",
+  name: "taxonomy",
+  label: "Taxonomy",
   component: Taxonomy,
   type: PluginComponentType.Panel,
   activator: myActivator,

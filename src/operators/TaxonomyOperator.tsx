@@ -7,6 +7,32 @@ import _ from "lodash";
 export class TaxonomyOperator extends Operator {
   // 3つツリーで通し番号を振るための変数
   globalItemId = 0;
+  totalItemCount = 0;
+
+  parentCssText = `
+    text-align: center;
+    width: 70px;
+    height:20px;
+    font-size: 14px;
+    font-weight: bold;
+    color: black;
+    background-color: orange;
+    position: absolute;
+    top: 15px;
+    left: 75%;`;
+
+  childCssText = `
+    text-align: center;
+    min-width: 35px;
+    max-width: 70px;
+    height:20px;
+    font-size: 14px;
+    font-weight: bold;
+    color: black;
+    background-color: #fcd299;
+    position: absolute;
+    top: 15px;
+    left: 75%;`;
 
   get config() {
     return new OperatorConfig({
@@ -46,8 +72,6 @@ export class TaxonomyOperator extends Operator {
     this.setEnvironmentalCondition(sortedData, items2);
     // 動的データ
     this.setDynamicElements(sortedData, items3);
-
-    console.log(items3)
   }
 
   // 静的空間データ
@@ -202,8 +226,6 @@ export class TaxonomyOperator extends Operator {
   }
 
   createTreeView(groupedCategory: any, category?: string): AggregatedResult {
-    // const [globalItemId, setglobalItemId] = useAtom(globalItemIdState);
-
     let totalCount = 0;
     let result: TaxonomyItem[] = [];
 
@@ -227,7 +249,6 @@ export class TaxonomyOperator extends Operator {
         },
       };
       this.globalItemId++;
-      // setglobalItemId((prevId) => prevId + 1);
 
       // tagNameでグループ化 (第2階層)
       const groupedData2 = _.groupBy(children, function (data: TaxonomyData) {
@@ -253,7 +274,6 @@ export class TaxonomyOperator extends Operator {
           },
         });
         this.globalItemId++;
-        // setglobalItemId((prevId) => prevId + 1);
 
         // tagValueでグループ化 (第3階層)
         const tagValues = _.filter(children2, function (child2: any) {
@@ -276,7 +296,6 @@ export class TaxonomyOperator extends Operator {
             },
           });
           this.globalItemId++;
-          // setglobalItemId((prevId) => prevId + 1);
         });
       });
 
