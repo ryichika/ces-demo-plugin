@@ -574,7 +574,7 @@ __metadata:
     "@emotion/react": "npm:^11.10.4"
     "@emotion/styled": "npm:^11.10.4"
     "@fiftyone/state": "npm:*"
-    "@mui/icons-material": "npm:^5.10.2"
+    "@mui/icons-material": "npm:^5.16.7"
     "@mui/material": "npm:^5.9.0"
     "@react-spring/web": "npm:^9.7.3"
     "@textea/json-viewer": "npm:^3.4.1"
@@ -601,6 +601,7 @@ __metadata:
     "@ungap/event-target": "npm:^0.2.2"
     "@xmldom/xmldom": "npm:^0.8.6"
     copy-to-clipboard: "npm:^3.3.1"
+    fast-png: "npm:^6.1.0"
     immutable: "npm:^4.0.0-rc.12"
     lodash: "npm:^4.17.21"
     lru-cache: "npm:^11.0.1"
@@ -805,7 +806,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/icons-material@npm:^5.10.2":
+"@mui/icons-material@npm:^5.16.7":
   version: 5.16.7
   resolution: "@mui/icons-material@npm:5.16.7"
   dependencies:
@@ -1374,6 +1375,13 @@ __metadata:
   dependencies:
     undici-types: "npm:~6.19.8"
   checksum: 10c0/ea489ae603aa8874e4e88980aab6f2dad09c755da779c88dd142983bfe9609803c89415ca7781f723072934066f63daf2b3339ef084a8ad1a8079cf3958be243
+  languageName: node
+  linkType: hard
+
+"@types/pako@npm:^2.0.0":
+  version: 2.0.3
+  resolution: "@types/pako@npm:2.0.3"
+  checksum: 10c0/45119ac3c4e8a77317c35493327039b74e333562f06ce038048228918d8ddfaa7958125aab960d1565b3861046022754c414dba1eecb210c44a32c415956bee2
   languageName: node
   linkType: hard
 
@@ -2154,6 +2162,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fast-png@npm:^6.1.0":
+  version: 6.2.0
+  resolution: "fast-png@npm:6.2.0"
+  dependencies:
+    "@types/pako": "npm:^2.0.0"
+    iobuffer: "npm:^5.3.2"
+    pako: "npm:^2.1.0"
+  checksum: 10c0/42b61a3c83dd254d47dfac350669c891d13d655eff2819dc99bd6a3f09c8cfb3f8f6cbd5354fa91a49c6a52e5665c60260cf1cf61a33bdacbdaf0fdcbbcfbe6c
+  languageName: node
+  linkType: hard
+
 "fast-shallow-equal@npm:^1.0.0":
   version: 1.0.0
   resolution: "fast-shallow-equal@npm:1.0.0"
@@ -2578,6 +2597,13 @@ __metadata:
   dependencies:
     loose-envify: "npm:^1.0.0"
   checksum: 10c0/5af133a917c0bcf65e84e7f23e779e7abc1cd49cb7fdc62d00d1de74b0d8c1b5ee74ac7766099fb3be1b05b26dfc67bab76a17030d2fe7ea2eef867434362dfc
+  languageName: node
+  linkType: hard
+
+"iobuffer@npm:^5.3.2":
+  version: 5.3.2
+  resolution: "iobuffer@npm:5.3.2"
+  checksum: 10c0/56832ca592a602d564ba89812ae0514f6ff38bd91426c62d78374369c431be8dda804a2d6d4a36a0af8dc787bf49fcf5d85f1103d8365601dd7ec9be1d113857
   languageName: node
   linkType: hard
 
@@ -3192,6 +3218,13 @@ __metadata:
   version: 1.0.1
   resolution: "package-json-from-dist@npm:1.0.1"
   checksum: 10c0/62ba2785eb655fec084a257af34dbe24292ab74516d6aecef97ef72d4897310bc6898f6c85b5cd22770eaa1ce60d55a0230e150fb6a966e3ecd6c511e23d164b
+  languageName: node
+  linkType: hard
+
+"pako@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "pako@npm:2.1.0"
+  checksum: 10c0/8e8646581410654b50eb22a5dfd71159cae98145bd5086c9a7a816ec0370b5f72b4648d08674624b3870a521e6a3daffd6c2f7bc00fdefc7063c9d8232ff5116
   languageName: node
   linkType: hard
 

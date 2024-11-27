@@ -153,13 +153,15 @@ function Taxonomy() {
   };
 
   // Test Code
-  const [count, setCount] = useState(0);
+  const count = searchExecutor.result?.count || -1;
   const onClickCount = () => {    
-    if (searchExecutor.execute().result) {
-      setCount(searchExecutor.execute().result.count);
-    } else {
-      setCount(-1);
-    }
+    // not this way...
+    // if (searchExecutor.execute().result) {
+    //   setCount(searchExecutor.execute().result.count);
+    // } else {
+    //   setCount(-1);
+    // }
+    searchExecutor.execute()
   };
 
   const onClickOpenPanel = () => {
