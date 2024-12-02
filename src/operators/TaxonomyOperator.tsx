@@ -7,8 +7,7 @@ import _ from "lodash";
 export class TaxonomyOperator extends Operator {
   // 3つツリーで通し番号を振るための変数
   globalItemId = 0;
-  totalItemCount = 0;
-
+  
   parentCssText = `
     text-align: center;
     width: 70px;

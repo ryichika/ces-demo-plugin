@@ -1,36 +1,35 @@
 // react
-import React, { useCallback, useMemo, useEffect, useState } from "react";
+import React, { useCallback, useMemo, useEffect, useState, SyntheticEvent } from "react";
 // recoil
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 // mui/material
 import { colors, Typography, Button } from "@mui/material";
-import SendIcon from '@mui/icons-material/Send';
+import SendIcon from "@mui/icons-material/Send";
 import { RichTreeView } from "@mui/x-tree-view/RichTreeView";
-import { TreeItem2, TreeItem2Props, TreeItem2SlotProps } from "@mui/x-tree-view/TreeItem2";
-import { useTreeItem2Utils } from "@mui/x-tree-view/hooks";
 // fiftyone
 import { registerOperator, useOperatorExecutor } from "@fiftyone/operators";
 import { TaxonomyOperator } from "@/operators/TaxonomyOperator";
 import * as fos from "@fiftyone/state";
 // etc
+import { CustomTreeItem } from "./CustomTreeItem";
 import { TaxonomyItem } from "@/types/type";
 import styled from "styled-components";
-import styles from "./style.module.css";
 import _ from "lodash";
 
 function Taxonomy() {
   const [treeItems1, settreeItems1] = useState([] as TaxonomyItem[]);
   const [treeItems2, settreeItems2] = useState([] as TaxonomyItem[]);
   const [treeItems3, settreeItems3] = useState([] as TaxonomyItem[]);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   // const [expandedItems1, setExpandedItems1] = useState<string[]>([]);
   // const [expandedItems2, setExpandedItems2] = useState<string[]>([]);
   // const [expandedItems3, setExpandedItems3] = useState<string[]>([]);
   const taxonomyExecutor = useOperatorExecutor("@voxel51/taxonomy_plugin/create_taxonomy");
   const searchExecutor = useOperatorExecutor("@voxel51/taxonomy_plugin/count_samples");
-  const panelExecutor = useOperatorExecutor("@voxel51/taxonomy_plugin/hello_world_panel");
-  const dataset = useRecoilState(fos.dataset) as any;
 
+  const dataset = useRecoilState(fos.dataset) as any;
+  const view = useRecoilValue(fos.view);
+  const filters = useRecoilValue(fos.filters);
+ 
   const Container = styled.div`
     padding: 20px 0;
     display: flex;
@@ -72,100 +71,38 @@ function Taxonomy() {
   `;
 
   useEffect(() => {
-    const fetchData = async () => {
-      let items1 = [] as TaxonomyItem[];
-      let items2 = [] as TaxonomyItem[];
-      let items3 = [] as TaxonomyItem[];
-      await taxonomyExecutor.execute({ items1, items2, items3 });
-
-      settreeItems1(items1);
-      settreeItems2(items2);
-      settreeItems3(items3);
-    };
-
-    fetchData();
+    setTimeout(async () => {
+      await fetchTaxonomyData();
+    }, 10000);
   }, []);
 
-  interface CustomLabelProps {
-    children: string;
-    className: string;
-    count: number;
-  }
+  const fetchTaxonomyData = async () => {
+    let items1 = [] as TaxonomyItem[];
+    let items2 = [] as TaxonomyItem[];
+    let items3 = [] as TaxonomyItem[];
+    await taxonomyExecutor.execute({ items1, items2, items3 });
 
-  function CustomLabel({ children, className, count }: CustomLabelProps & TreeItem2Props) {
-    return (
-      <div className={className} style={{ position: "relative", width: "100%" }}>
-        <Typography>{children}</Typography>
-        {count && (
-          <div
-            style={{
-              position: "absolute",
-              right: "10px",
-              bottom: "2px",
-              width: "fit-content",
-              backgroundColor: "orange",
-              textAlign: "center",
-              padding: "0 5px",
-            }}
-          >
-            <Typography color="black">{count}</Typography>
-          </div>
-        )}
-      </div>
-    );
-  }
+    settreeItems1(items1);
+    settreeItems2(items2);
+    settreeItems3(items3);
+  };
 
-  const CustomCheckbox = React.forwardRef(function CustomCheckbox(
-    props: React.InputHTMLAttributes<HTMLInputElement>,
-    ref: React.Ref<HTMLInputElement>,
-  ) {
-    return <input type="checkbox" ref={ref} {...props} />;
-  });
+  const onSelectedItemsChange1 = (event: SyntheticEvent, ids: string[]) => {
+    const result = _.filter(treeItems1, (item) => ids.includes(item.id.toString()));
+  };
 
-  const CustomTreeItem = React.forwardRef(function CustomTreeItem(
-    props: TreeItem2Props,
-    ref: React.Ref<HTMLLIElement>
-  ) {
-    const { publicAPI } = useTreeItem2Utils({
-      itemId: props.itemId,
-      children: props.children,
-    });
+  const onSelectedItemsChange2 = (event: SyntheticEvent, ids: string[]) => {
+    const result = _.filter(treeItems2, (item) => ids.includes(item.id.toString()));
+  };
 
-    const item = publicAPI.getItem(props.itemId);
-
-    return (
-      <TreeItem2
-        {...props}
-        ref={ref}
-        slots={{
-          label: CustomLabel,
-          checkbox: CustomCheckbox,
-        }}
-        slotProps={{
-          label: { count: item?.count || 0 } as CustomLabelProps,          
-        }}
-      />
-    );
-  });
-
-  const handleSelectedItemsChange = (event: React.SyntheticEvent, ids: string[]) => {
-    console.log(ids);
+  const onSelectedItemsChange3 = (event: SyntheticEvent, ids: string[]) => {
+    const result = _.filter(treeItems3, (item) => ids.includes(item.id.toString()));
   };
 
   // Test Code
   const count = searchExecutor.result?.count || -1;
-  const onClickCount = () => {    
-    // not this way...
-    // if (searchExecutor.execute().result) {
-    //   setCount(searchExecutor.execute().result.count);
-    // } else {
-    //   setCount(-1);
-    // }
-    searchExecutor.execute()
-  };
-
-  const onClickOpenPanel = () => {
-    panelExecutor.execute();
+  const onClickCount = () => {
+    searchExecutor.execute();
   };
 
   return (
@@ -240,20 +177,14 @@ function Taxonomy() {
                     checkboxSelection
                     items={treeItems1}
                     slots={{ item: CustomTreeItem }}
-                    onSelectedItemsChange={handleSelectedItemsChange}
+                    onSelectedItemsChange={onSelectedItemsChange1}
                   />
                 )}
               </DetailPanelContentTreeBox>
               <DetailPanelContentTreeBox className="detail-panel-content-tree-box">
                 <DetailPanelContentTreeBoxHeader>Environmental Condition</DetailPanelContentTreeBoxHeader>
                 {treeItems2.length && (
-                  <RichTreeView
-                    multiSelect
-                    checkboxSelection
-                    items={treeItems2}
-                    slots={{ item: CustomTreeItem }}
-                    onSelectedItemsChange={handleSelectedItemsChange}
-                  />
+                  <RichTreeView multiSelect checkboxSelection items={treeItems2} slots={{ item: CustomTreeItem }} onSelectedItemsChange={onSelectedItemsChange2} />
                 )}
               </DetailPanelContentTreeBox>
               <DetailPanelContentTreeBox className="detail-panel-content-tree-box">
@@ -264,17 +195,18 @@ function Taxonomy() {
                     checkboxSelection
                     items={treeItems3}
                     slots={{ item: CustomTreeItem }}
-                    onSelectedItemsChange={handleSelectedItemsChange}
+                    onSelectedItemsChange={onSelectedItemsChange3}
                   />
                 )}
               </DetailPanelContentTreeBox>
             </DetailPanelContentTreeBoxes>
           </DetailPanelContentTree>
-        </DetailPanelContent>        
+        </DetailPanelContent>
       </Container>
       <p>Database count: {count}</p>
-      <Button variant="outlined" endIcon={<SendIcon />} onClick={onClickCount}>Count</Button>
-      <Button variant="outlined" endIcon={<SendIcon />} onClick={onClickOpenPanel}>Open Panel</Button>
+      <Button variant="outlined" endIcon={<SendIcon />} onClick={onClickCount}>
+        Count
+      </Button>      
     </React.StrictMode>
   );
 }

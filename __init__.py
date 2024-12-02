@@ -62,7 +62,7 @@ class HelloWorldPanel(foo.Panel):
         )
 
     def on_load(self, ctx):
-        ctx.panel.state.hello_message = "Hello world!"
+        ctx.panel.state.hello_message = "Hello world!!!"
 
     def say_hello(self, ctx):
         ctx.ops.notify(ctx.panel.state.hello_message)
