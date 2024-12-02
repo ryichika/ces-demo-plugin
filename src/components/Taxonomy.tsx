@@ -18,6 +18,7 @@ import { TaxonomyItem, TaxonomyData } from '@/types/type'
 import styled from 'styled-components'
 // etc
 import httpClient from '@/utils/httpClient'
+import { TaxonomyBulder } from "@/core/TaxonomyBuilder";
 import _ from 'lodash'
 
 const Container = styled.div`
@@ -75,29 +76,30 @@ function Taxonomy() {
   const [treeItems1, settreeItems1] = useState([] as TaxonomyItem[])
   const [treeItems2, settreeItems2] = useState([] as TaxonomyItem[])
   const [treeItems3, settreeItems3] = useState([] as TaxonomyItem[])
-  // const [expandedItems1, setExpandedItems1] = useState<string[]>([]);
-  // const [expandedItems2, setExpandedItems2] = useState<string[]>([]);
-  // const [expandedItems3, setExpandedItems3] = useState<string[]>([]);
   const [images, setImages] = useState([] as string[])
   const [isLoading, setIsLoading] = useState(false)
-  const taxonomyExecutor = useOperatorExecutor('@voxel51/taxonomy_plugin/create_taxonomy')
 
-  const dataset = useRecoilState(fos.dataset) as any
-  const view = useRecoilValue(fos.view)
-  const filters = useRecoilValue(fos.filters)
+  // const taxonomyExecutor = useOperatorExecutor('@voxel51/taxonomy_plugin/create_taxonomy')
+  // const dataset = useRecoilState(fos.dataset) as any
+  // const view = useRecoilValue(fos.view)
+  // const filters = useRecoilValue(fos.filters)
 
   useEffect(() => {
-    ;(async () => {
+    (async () => {
       await fetchTaxonomyData()
-    })()
+    })();
   }, [])
 
   const fetchTaxonomyData = async () => {
-    let items1 = [] as TaxonomyItem[]
-    let items2 = [] as TaxonomyItem[]
-    let items3 = [] as TaxonomyItem[]
+    const items1 = [] as TaxonomyItem[]
+    const items2 = [] as TaxonomyItem[]
+    const items3 = [] as TaxonomyItem[]
+    const builder = new TaxonomyBulder()
+    await builder.execute(items1, items2, items3)
 
-    await taxonomyExecutor.execute({ items1, items2, items3 })
+    // [Memo] To avoid re-paint after the initial display when using an Operator, retrieve the data without using an Operator
+    // await taxonomyExecutor.execute({ items1, items2, items3 })
+    
     settreeItems1(items1)
     settreeItems2(items2)
     settreeItems3(items3)
@@ -151,14 +153,14 @@ function Taxonomy() {
       formData.append('targetTableForTags', 'tag_table_EmbeddedImages_v6_Updated_NT_2')
       const response = await httpClient.post('/v1/searchByTaxonomyv2', formData)
 
-      console.log(response.data.searchedSimilarImages)
+      // console.log(response.data.searchedSimilarImages)
       setImages(response.data.searchedSimilarImages)
     } finally {
       setIsLoading(false)
     }
   }
 
-  // Test Code
+  // Test Code (Python Operator)
   // const count = searchExecutor.result?.count || -1;
   // const onClickCount = () => {
   //   searchExecutor.execute();

@@ -1,25 +1,12 @@
-import { Operator, OperatorConfig, registerOperator } from '@fiftyone/operators'
-
 import { TaxonomyData, TaxonomyItem, AggregatedResult } from '@/types/type'
 import httpClient from '@/utils/httpClient'
 import _ from 'lodash'
 
-export class TaxonomyOperator extends Operator {
+export class TaxonomyBulder {
   // 3つのツリーで通し番号を振るための変数
   globalItemId = 0
 
-  get config() {
-    return new OperatorConfig({
-      name: 'create_taxonomy',
-      label: 'Create Taxonomy',
-      unlisted: true,
-    })
-  }
-
-  async execute(ctx: any) {
-    let items1 = ctx.params.items1
-    let items2 = ctx.params.items2
-    let items3 = ctx.params.items3
+  async execute(items1: TaxonomyItem[], items2: TaxonomyItem[], items3: TaxonomyItem[]) {
     await this.setTaxonomyData(items1, items2, items3)
   }
 
@@ -258,8 +245,6 @@ export class TaxonomyOperator extends Operator {
     }
     this.globalItemId++
     items.push(newItemD4)
-
-    // imageSearchStore.cachedTaxonomies3 = items3.value;
   }
 
   createTreeView(groupedCategory: any, category?: string): AggregatedResult {
