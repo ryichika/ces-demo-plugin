@@ -51,6 +51,22 @@ const DetailPanelContentTreeBoxHeader = styled.div`
   border-bottom: 1px solid #c0c0c0;
 `
 
+const DetailPanelContentTreeBoxBody = styled.div`
+  overflow-y: auto;
+  height: calc(100% - 120px);
+
+  &::-webkit-scrollbar {
+    background: rgba(0, 0, 0, 0.2);
+    width: 5px;
+    height: 5px;
+    border-radius: 20px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(245, 245, 245, 0.2);
+    border-radius: 20px;
+  }
+`
 const DetailPanelContentTreeBoxes = styled.div`
   display: flex;
   justify-content: space-between;
@@ -248,39 +264,45 @@ function Taxonomy() {
             <DetailPanelContentTreeBoxes>
               <DetailPanelContentTreeBox className="detail-panel-content-tree-box">
                 <DetailPanelContentTreeBoxHeader>Scenery Elements</DetailPanelContentTreeBoxHeader>
-                {treeItems1.length && (
-                  <RichTreeView
-                    multiSelect
-                    checkboxSelection
-                    items={treeItems1}
-                    slots={{ item: CustomTreeItem }}
-                    onSelectedItemsChange={onSelectedItemsChange1}
-                  />
-                )}
+                <DetailPanelContentTreeBoxBody>
+                  {treeItems1.length && (
+                    <RichTreeView
+                      multiSelect
+                      checkboxSelection
+                      items={treeItems1}
+                      slots={{ item: CustomTreeItem }}
+                      onSelectedItemsChange={onSelectedItemsChange1}
+                    />
+                  )}
+                </DetailPanelContentTreeBoxBody>
               </DetailPanelContentTreeBox>
               <DetailPanelContentTreeBox className="detail-panel-content-tree-box">
                 <DetailPanelContentTreeBoxHeader>Environmental Condition</DetailPanelContentTreeBoxHeader>
-                {treeItems2.length && (
-                  <RichTreeView
-                    multiSelect
-                    checkboxSelection
-                    items={treeItems2}
-                    slots={{ item: CustomTreeItem }}
-                    onSelectedItemsChange={onSelectedItemsChange2}
-                  />
-                )}
+                <DetailPanelContentTreeBoxBody>
+                  {treeItems2.length && (
+                    <RichTreeView
+                      multiSelect
+                      checkboxSelection
+                      items={treeItems2}
+                      slots={{ item: CustomTreeItem }}
+                      onSelectedItemsChange={onSelectedItemsChange2}
+                    />
+                  )}
+                </DetailPanelContentTreeBoxBody>
               </DetailPanelContentTreeBox>
               <DetailPanelContentTreeBox className="detail-panel-content-tree-box">
                 <DetailPanelContentTreeBoxHeader>Dynamic Elements</DetailPanelContentTreeBoxHeader>
-                {treeItems3.length && (
-                  <RichTreeView
-                    multiSelect
-                    checkboxSelection
-                    items={treeItems3}
-                    slots={{ item: CustomTreeItem }}
-                    onSelectedItemsChange={onSelectedItemsChange3}
-                  />
-                )}
+                <DetailPanelContentTreeBoxBody>
+                  {treeItems3.length && (
+                    <RichTreeView
+                      multiSelect
+                      checkboxSelection
+                      items={treeItems3}
+                      slots={{ item: CustomTreeItem }}
+                      onSelectedItemsChange={onSelectedItemsChange3}
+                    />
+                  )}
+                </DetailPanelContentTreeBoxBody>
               </DetailPanelContentTreeBox>
             </DetailPanelContentTreeBoxes>
           </DetailPanelContentTree>
