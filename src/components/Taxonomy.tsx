@@ -7,6 +7,7 @@ import { colors, Typography, Button, Divider } from '@mui/material'
 import CircularProgress from '@mui/material/CircularProgress'
 import SearchIcon from '@mui/icons-material/Search'
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView'
+import TextField from '@mui/material/TextField'
 // fiftyone
 import { registerOperator, useOperatorExecutor } from '@fiftyone/operators'
 import { TaxonomyOperator } from '@/operators/TaxonomyOperator'
@@ -18,17 +19,18 @@ import { TaxonomyItem, TaxonomyData } from '@/types/type'
 import styled from 'styled-components'
 // etc
 import httpClient from '@/utils/httpClient'
-import { TaxonomyBulder } from "@/core/TaxonomyBuilder";
+import { TaxonomyBulder } from '@/core/TaxonomyBuilder'
 import _ from 'lodash'
 
 const Container = styled.div`
   padding: 20px 0;
   display: flex;
   justify-content: center;
+  height: calc(100dvh - 290px);
 `
 
 const DetailPanelContent = styled.div`
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
   color: #c0c0c0;
   margin-bottom: 20px;
@@ -38,6 +40,7 @@ const DetailPanelContent = styled.div`
 
 const DetailPanelContentTree = styled.div`
   position: relative;
+  overflow-y: hidden;
 `
 
 const DetailPanelContentTreeBoxHeader = styled.div`
@@ -61,6 +64,16 @@ const DetailPanelContentTreeBox = styled.div`
   height: calc(100vh - 320px);
 `
 
+const TextFieldBox = styled.div`
+  overflow-y: auto;
+  width: 100%;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+  padding: 5px;
+`
+
 const ActionBox = styled.div`
   width: 100%;
   display: flex;
@@ -77,6 +90,7 @@ function Taxonomy() {
   const [treeItems2, settreeItems2] = useState([] as TaxonomyItem[])
   const [treeItems3, settreeItems3] = useState([] as TaxonomyItem[])
   const [images, setImages] = useState([] as string[])
+  const [searchText, setSearchText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
   // const taxonomyExecutor = useOperatorExecutor('@voxel51/taxonomy_plugin/create_taxonomy')
@@ -85,9 +99,9 @@ function Taxonomy() {
   // const filters = useRecoilValue(fos.filters)
 
   useEffect(() => {
-    (async () => {
+    ;(async () => {
       await fetchTaxonomyData()
-    })();
+    })()
   }, [])
 
   const fetchTaxonomyData = async () => {
@@ -99,7 +113,7 @@ function Taxonomy() {
 
     // [Memo] To avoid re-paint after the initial display when using an Operator, retrieve the data without using an Operator
     // await taxonomyExecutor.execute({ items1, items2, items3 })
-    
+
     settreeItems1(items1)
     settreeItems2(items2)
     settreeItems3(items3)
@@ -139,6 +153,8 @@ function Taxonomy() {
 
   const onSelectedItemsChange3 = (event: SyntheticEvent, ids: string[]) => setSourceDataTraverseTree(ids[0], treeItems3, 3)
 
+  const onChangeText = (event: React.ChangeEvent<HTMLTextAreaElement>) => setSearchText(event.target.value)
+
   const onClickSearch = async () => {
     setIsLoading(true)
     const concatTaxonomies = _.concat(selectedTaxonomies1, selectedTaxonomies2, selectedTaxonomies3)
@@ -147,7 +163,7 @@ function Taxonomy() {
       const formData = new FormData()
       formData.append('startDate', '')
       formData.append('endDate', '')
-      formData.append('text', '')
+      formData.append('text', searchText)
       formData.append('targetTableForText', 'EmbeddedImages_v6')
       formData.append('tags', JSON.stringify(concatTaxonomies))
       formData.append('targetTableForTags', 'tag_table_EmbeddedImages_v6_Updated_NT_2')
@@ -270,6 +286,12 @@ function Taxonomy() {
           </DetailPanelContentTree>
         </DetailPanelContent>
       </Container>
+
+      <TextFieldBox>
+        <textarea rows={1} placeholder="Please enter the content you want to search for." style={{ width: '80%' }} onChange={onChangeText}>
+          {searchText}
+        </textarea>
+      </TextFieldBox>
 
       <ActionBox>
         <Button
