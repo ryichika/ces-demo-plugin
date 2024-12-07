@@ -1,9 +1,10 @@
+import os
+import requests
+from urllib.parse import urlparse, unquote
 import fiftyone as fo
 import fiftyone.operators as foo
 import fiftyone.operators.types as types
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
-import os
-
 
 class CountSamples(foo.Operator):
     @property
@@ -15,46 +16,33 @@ class CountSamples(foo.Operator):
         )
 
     def resolve_input(self, ctx):
-        inputs = types.Object()
+        pass
 
-        if ctx.view != ctx.dataset.view():
-            choices = types.RadioGroup()
-            choices.add_choice(
-                "DATASET",
-                label="Dataset",
-                description="Count the number of samples in the dataset",
-            )
-
-            choices.add_choice(
-                "VIEW",
-                label="Current view",
-                description="Count the number of samples in the current view",
-            )
-
-            inputs.enum(
-                "target",
-                choices.values(),
-                required=True,
-                default="VIEW",
-                view=choices,
-            )
-
-        return types.Property(inputs, view=types.View(label="Count samples"))
-
-    def execute(self, ctx):
-        print("Executing count_samples")
-        target = ctx.params.get("target", "DATASET")
-        sample_collection = ctx.view if target == "VIEW" else ctx.dataset
-        return {"count": sample_collection.count()}
+    def execute(self, ctx):     
+        # 任意のディレクトリパス
+        target_directory = "/home/ichikawa/ces/images"
+        os.makedirs(target_directory, exist_ok=True)
+               
+        ctx.dataset.clear()
+        # ctx.dataset.delete()
+        images = ctx.params.get("images", None)
+        for image_url in images:
+            response = requests.get(image_url)
+            if response.status_code == 200:
+                parsed_url = urlparse(image_url)
+                image_name = os.path.basename(parsed_url.path)
+                # URLエンコードされた文字をデコード
+                image_name = unquote(image_name)    
+                image_path = os.path.join(target_directory, image_name)
+                with open(image_path, 'wb') as f:
+                    f.write(response.content)
+                ctx.dataset.add_samples([fo.Sample(filepath=image_path)])
+            else:
+                with open('/home/ichikawa/ces/failed-images.txt', 'w') as file:
+                    print(f"Failed to download {image_url}")
 
     def resolve_output(self, ctx):
-        target = ctx.params.get("target", "DATASET")
-        outputs = types.Object()
-        outputs.int(
-            "count",
-            label=f"Number of samples in the current {target.lower()}",
-        )
-        return types.Property(outputs)
+        pass
 
 class HelloWorldPanel(foo.Panel):
     selected_ids = []

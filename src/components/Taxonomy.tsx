@@ -110,7 +110,8 @@ function Taxonomy() {
   const [isLoading, setIsLoading] = useState(false)
 
   // const taxonomyExecutor = useOperatorExecutor('@voxel51/taxonomy_plugin/create_taxonomy')
-  const dataset = useRecoilState(fos.dataset) as any
+  const registerImageExecutor = useOperatorExecutor("@voxel51/taxonomy_plugin/count_samples");
+  // const dataset = useRecoilState(fos.dataset) as any
   // const view = useRecoilValue(fos.view)
   // const filters = useRecoilValue(fos.filters)
 
@@ -182,9 +183,10 @@ function Taxonomy() {
       formData.append('tags', JSON.stringify(concatTaxonomies))
       formData.append('targetTableForTags', 'tag_table_EmbeddedImages_v6_Updated_NT_2')
       const response = await httpClient.post('/v1/searchByTaxonomyv2', formData)
-
-      // console.log(response.data.searchedSimilarImages)
       setImages(response.data.searchedSimilarImages)
+
+      // display the number of images found int the Sample panel
+      registerImageExecutor.execute({ images: response.data.searchedSimilarImages.map((image: any) => image.sas_url) })      
     } finally {
       setIsLoading(false)
     }
