@@ -110,7 +110,7 @@ function Taxonomy() {
   const [isLoading, setIsLoading] = useState(false)
 
   // const taxonomyExecutor = useOperatorExecutor('@voxel51/taxonomy_plugin/create_taxonomy')
-  // const dataset = useRecoilState(fos.dataset) as any
+  const dataset = useRecoilState(fos.dataset) as any
   // const view = useRecoilValue(fos.view)
   // const filters = useRecoilValue(fos.filters)
 
@@ -135,9 +135,7 @@ function Taxonomy() {
     settreeItems3(items3)
   }
 
-  const setSourceDataTraverseTree = (selectedId: string, treeItems: TaxonomyItem[], treeId: number) => {
-    selectedNodeIds.includes(selectedId) ? selectedNodeIds.splice(selectedNodeIds.indexOf(selectedId), 1) : selectedNodeIds.push(selectedId)
-
+  const setSourceDataTraverseTree = (selectedNodeIds: string[], treeItems: TaxonomyItem[], treeId: number) => {    
     const selectedSourceDatas = [] as TaxonomyData[]
     selectedNodeIds.forEach((id) => {
       function traverseTree(item: TaxonomyItem) {
@@ -163,11 +161,11 @@ function Taxonomy() {
     }
   }
 
-  const onSelectedItemsChange1 = (event: SyntheticEvent, ids: string[]) => setSourceDataTraverseTree(ids[0], treeItems1, 1)
+  const onSelectedItemsChange1 = (event: SyntheticEvent, ids: string[]) => setSourceDataTraverseTree(ids, treeItems1, 1)
 
-  const onSelectedItemsChange2 = (event: SyntheticEvent, ids: string[]) => setSourceDataTraverseTree(ids[0], treeItems2, 2)
+  const onSelectedItemsChange2 = (event: SyntheticEvent, ids: string[]) => setSourceDataTraverseTree(ids, treeItems2, 2)
 
-  const onSelectedItemsChange3 = (event: SyntheticEvent, ids: string[]) => setSourceDataTraverseTree(ids[0], treeItems3, 3)
+  const onSelectedItemsChange3 = (event: SyntheticEvent, ids: string[]) => setSourceDataTraverseTree(ids, treeItems3, 3)
 
   const onChangeText = (event: React.ChangeEvent<HTMLTextAreaElement>) => setSearchText(event.target.value)
 
