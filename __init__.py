@@ -6,12 +6,12 @@ import fiftyone.operators as foo
 import fiftyone.operators.types as types
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
-class CountSamples(foo.Operator):
+class RegisterImagesOperator(foo.Operator):
     @property
     def config(self):
         return foo.OperatorConfig(
-            name="count_samples",
-            label="Count samples",
+            name="register_images",
+            label="Register images",
             dynamic=True,
         )
 
@@ -19,13 +19,14 @@ class CountSamples(foo.Operator):
         pass
 
     def execute(self, ctx):     
-        # 任意のディレクトリパス
+        # 画像を一時保存する任意のディレクトリパス
         target_directory = "/home/ichikawa/ces/images"
         os.makedirs(target_directory, exist_ok=True)
                
         ctx.dataset.clear()
         # ctx.dataset.delete()
         images = ctx.params.get("images", None)
+        new_samples = []
         for image_url in images:
             response = requests.get(image_url)
             if response.status_code == 200:
@@ -36,10 +37,14 @@ class CountSamples(foo.Operator):
                 image_path = os.path.join(target_directory, image_name)
                 with open(image_path, 'wb') as f:
                     f.write(response.content)
-                ctx.dataset.add_samples([fo.Sample(filepath=image_path)])
+                # ctx.dataset.add_samples([fo.Sample(filepath=image_path)])
+                new_samples.append(fo.Sample(filepath=image_path))
             else:
-                with open('/home/ichikawa/ces/failed-images.txt', 'w') as file:
+                # with open('/home/ichikawa/ces/failed-images.txt', 'w') as file:
+                with open('~/ces/failed-images.txt', 'w') as file:
                     print(f"Failed to download {image_url}")
+                    
+        ctx.dataset.add_samples(new_samples)
 
     def resolve_output(self, ctx):
         pass
@@ -129,5 +134,5 @@ class HelloWorldPanel(foo.Panel):
     
 
 def register(p):
-    p.register(CountSamples)
+    p.register(RegisterImagesOperator)
     p.register(HelloWorldPanel)

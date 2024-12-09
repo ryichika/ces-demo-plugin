@@ -110,10 +110,7 @@ function Taxonomy() {
   const [isLoading, setIsLoading] = useState(false)
 
   // const taxonomyExecutor = useOperatorExecutor('@voxel51/taxonomy_plugin/create_taxonomy')
-  const registerImageExecutor = useOperatorExecutor("@voxel51/taxonomy_plugin/count_samples");
-  // const dataset = useRecoilState(fos.dataset) as any
-  // const view = useRecoilValue(fos.view)
-  // const filters = useRecoilValue(fos.filters)
+  const registerImageExecutor = useOperatorExecutor("@voxel51/taxonomy_plugin/register_images");
 
   useEffect(() => {
     ;(async () => {
