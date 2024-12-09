@@ -7,7 +7,7 @@ import { colors, Typography, Button, Divider } from '@mui/material'
 import CircularProgress from '@mui/material/CircularProgress'
 import SearchIcon from '@mui/icons-material/Search'
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView'
-import TextField from '@mui/material/TextField'
+import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 // fiftyone
 import { registerOperator, useOperatorExecutor } from '@fiftyone/operators'
 import { TaxonomyOperator } from '@/operators/TaxonomyOperator'
@@ -108,6 +108,7 @@ function Taxonomy() {
   const [images, setImages] = useState([] as string[])
   const [searchText, setSearchText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [openSnackbar, setOpenSnackbar] = useState(false)
   
   // const registerImageExecutor = useOperatorExecutor("@voxel51/taxonomy_plugin/register_images");
   const registerImageExecutor = useOperatorExecutor("@voxel51/taxonomy_plugin/register_images");
@@ -180,10 +181,12 @@ function Taxonomy() {
       formData.append('tags', JSON.stringify(concatTaxonomies))
       formData.append('targetTableForTags', 'tag_table_EmbeddedImages_v6_Updated_NT_2')
       const response = await httpClient.post('/v1/searchByTaxonomyv2', formData)
-      setImages(response.data.searchedSimilarImages)
+      // setImages(response.data.searchedSimilarImages)
 
       // display the number of images found int the Sample panel
       registerImageExecutor.execute({ images: response.data.searchedSimilarImages.map((image: any) => image.sas_url) })      
+
+      setOpenSnackbar(true)
     } finally {
       setIsLoading(false)
     }
@@ -217,7 +220,7 @@ function Taxonomy() {
                 height: '28px',
                 position: 'absolute',
                 left: '50%',
-                top: '29px',
+                top: '32px',
               }}
             ></div>
             <div
@@ -226,7 +229,7 @@ function Taxonomy() {
                 height: '14px',
                 position: 'absolute',
                 left: '16%',
-                top: '40px',
+                top: '45px',
               }}
             ></div>
             <div
@@ -235,7 +238,7 @@ function Taxonomy() {
                 height: '14px',
                 position: 'absolute',
                 left: '84%',
-                top: '40px',
+                top: '45px',
               }}
             ></div>
             <div
@@ -245,7 +248,7 @@ function Taxonomy() {
                 width: '34%',
                 position: 'absolute',
                 left: '16%',
-                top: '40px',
+                top: '45px',
               }}
             ></div>
             <div
@@ -255,7 +258,7 @@ function Taxonomy() {
                 width: '34%',
                 position: 'absolute',
                 left: '50%',
-                top: '40px',
+                top: '45px',
               }}
             ></div>
             <DetailPanelContentTreeBoxes>
@@ -324,9 +327,16 @@ function Taxonomy() {
         <CircularProgress style={{ display: isLoading ? 'block' : 'none' }} />
       </ActionBox>
 
-      <Divider style={{ marginTop: '20px' }}></Divider>
+      {/* <Divider style={{ marginTop: '20px' }}></Divider> */}
 
       <SearchedImageList images={images}></SearchedImageList>
+
+      <Snackbar
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={openSnackbar}
+        autoHideDuration={4000}
+        message="Please update the sample panel."
+      />
     </React.StrictMode>
   )
 }

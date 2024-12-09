@@ -21,6 +21,9 @@ class RegisterImagesOperator(foo.Operator):
     def execute(self, ctx):     
         # 画像を一時保存する任意のディレクトリパス
         target_directory = "/home/ichikawa/ces/images"
+        if not os.path.isdir(target_directory):
+            target_directory = "/home/Ichikawa/ces/images"
+                        
         os.makedirs(target_directory, exist_ok=True)
                
         ctx.dataset.clear()
@@ -37,14 +40,15 @@ class RegisterImagesOperator(foo.Operator):
                 image_path = os.path.join(target_directory, image_name)
                 with open(image_path, 'wb') as f:
                     f.write(response.content)
-                ctx.dataset.add_samples([fo.Sample(filepath=image_path)])
-                # new_samples.append(fo.Sample(filepath=image_path))
+                sample = fo.Sample(filepath=image_path)
+                # 画像にタグ付け
+                # sample.tags.append("sunny")
+                
+                ctx.dataset.add_samples([sample])
             else:
                 # with open('/home/ichikawa/ces/failed-images.txt', 'w') as file:
                 with open('~/ces/failed-images.txt', 'w') as file:
                     print(f"Failed to download {image_url}")
-                    
-        # ctx.dataset.add_samples(new_samples)
 
     def resolve_output(self, ctx):
         pass
