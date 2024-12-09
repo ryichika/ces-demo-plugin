@@ -37,14 +37,14 @@ class RegisterImagesOperator(foo.Operator):
                 image_path = os.path.join(target_directory, image_name)
                 with open(image_path, 'wb') as f:
                     f.write(response.content)
-                # ctx.dataset.add_samples([fo.Sample(filepath=image_path)])
-                new_samples.append(fo.Sample(filepath=image_path))
+                ctx.dataset.add_samples([fo.Sample(filepath=image_path)])
+                # new_samples.append(fo.Sample(filepath=image_path))
             else:
                 # with open('/home/ichikawa/ces/failed-images.txt', 'w') as file:
                 with open('~/ces/failed-images.txt', 'w') as file:
                     print(f"Failed to download {image_url}")
                     
-        ctx.dataset.add_samples(new_samples)
+        # ctx.dataset.add_samples(new_samples)
 
     def resolve_output(self, ctx):
         pass

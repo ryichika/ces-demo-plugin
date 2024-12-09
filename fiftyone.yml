@@ -3,7 +3,7 @@ description: FiftyOne Javascript plugin for CES demo
 version: 1.0.0
 fiftyone:
   version: "*"
-url: https://github.com/voxel51/hello-world-plugin-js
+url: https://github.com/ryichika/ces-demo-plugin
 license: Apache 2.0
 operators:
   - create_taxonomy

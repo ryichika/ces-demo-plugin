@@ -108,8 +108,8 @@ function Taxonomy() {
   const [images, setImages] = useState([] as string[])
   const [searchText, setSearchText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-
-  // const taxonomyExecutor = useOperatorExecutor('@voxel51/taxonomy_plugin/create_taxonomy')
+  
+  // const registerImageExecutor = useOperatorExecutor("@voxel51/taxonomy_plugin/register_images");
   const registerImageExecutor = useOperatorExecutor("@voxel51/taxonomy_plugin/register_images");
 
   useEffect(() => {
