@@ -7,6 +7,8 @@ import fiftyone.operators.types as types
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
 class RegisterImagesOperator(foo.Operator):
+    home_directory = "/home/ichikawa"
+    
     @property
     def config(self):
         return foo.OperatorConfig(
@@ -20,10 +22,11 @@ class RegisterImagesOperator(foo.Operator):
 
     def execute(self, ctx):     
         # 画像を一時保存する任意のディレクトリパス
-        target_directory = "/home/ichikawa/ces/images"
-        if not os.path.isdir(target_directory):
-            target_directory = "/home/Ichikawa/ces/images"
-                        
+        target_directory = ""
+        if not os.path.isdir(self.home_directory):
+            self.home_directory = "/home/Ichikawa"
+        
+        target_directory = self.home_directory + "/ces/images"                            
         os.makedirs(target_directory, exist_ok=True)
                
         ctx.dataset.clear()
@@ -99,7 +102,11 @@ class HelloWorldPanel(foo.Panel):
             "DefaultEndpointsProtocol=https;AccountName=stm2studiodev;AccountKey=JAjGToHDsVP/9DXiNzLZOC5V51fnoqLlTg8bNGqHovmbAtVj1hF4vIpFjn3lBO7jUnNDT4dhjT7HdoYVli19zw==;EndpointSuffix=core.windows.net"
         )
         container_client = blob_service_client.get_container_client("selected-images")
-        with open('/home/ichikawa/ces/selected-images.txt', 'w') as file:
+        
+        if not os.path.isdir(self.target_directory):
+            self.target_directory = "/home/Ichikawa"            
+            
+        with open(F"{self.target_directory}/ces/selected-images.txt", 'w') as file:
             filepaths_str = ""
             for id in selected_ids:
                 target = view[id]
