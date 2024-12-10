@@ -47,13 +47,10 @@ class RegisterImagesOperator(foo.Operator):
                         f.write(response.content)
                     sample = fo.Sample(filepath=image_path)                                
                     ctx.dataset.add_samples([sample]) 
-                else:
-                    # with open('/home/ichikawa/ces/failed-images.txt', 'w') as file:
-                    with open('~/ces/failed-images.txt', 'w') as file:
-                        print(f"Failed to download {image_url}")
-                # 画像の登録が完了したら、データセットをリロードする
-                ctx.ops.reload_dataset()
-                ctx.ops.notify("Images have been updated successfully.")   
+            
+            # 画像の登録が完了したら、データセットをリロードする
+            ctx.ops.reload_dataset()
+            ctx.ops.notify("Images have been updated successfully.")   
           
         return {"isCompleted": 1}
 
