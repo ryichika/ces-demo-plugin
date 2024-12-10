@@ -26,9 +26,6 @@ class RegisterImagesOperator(foo.Operator):
         if not os.path.isdir(self.home_directory):
             # ローカル環境用
             self.home_directory = "/home/ichikawa" 
-        if not os.path.isdir(self.home_directory):
-            # MSDN環境用
-            self.home_directory = "/home/Ichikawa"
         
         target_directory = self.home_directory + "/ces/images"                      
         os.makedirs(target_directory, exist_ok=True)
