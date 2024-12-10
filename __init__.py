@@ -7,7 +7,7 @@ import fiftyone.operators.types as types
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
 class RegisterImagesOperator(foo.Operator):
-    home_directory = "/home/ichikawa"
+    home_directory = "/home/microsoft"
     
     @property
     def config(self):
@@ -24,9 +24,13 @@ class RegisterImagesOperator(foo.Operator):
         # 画像を一時保存する任意のディレクトリパス
         target_directory = ""
         if not os.path.isdir(self.home_directory):
+            # ローカル環境用
+            self.home_directory = "/home/ichikawa" 
+        if not os.path.isdir(self.home_directory):
+            # MSDN環境用
             self.home_directory = "/home/Ichikawa"
         
-        target_directory = self.home_directory + "/ces/images"                            
+        target_directory = self.home_directory + "/ces/images"                      
         os.makedirs(target_directory, exist_ok=True)
                
         ctx.dataset.clear()
