@@ -33,10 +33,9 @@ class RegisterImagesOperator(foo.Operator):
         
         os.makedirs(target_directory, exist_ok=True)        
         ctx.dataset.clear()   
-        ctx.trigger("reload_dataset")      
+        # ctx.trigger("reload_dataset") 
         
-        images = ctx.params.get("images", None)
-        count = 1
+        images = ctx.params.get("images", None)        
         for image_url in images:
             response = requests.get(image_url)
             if response.status_code == 200:
