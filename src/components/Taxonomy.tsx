@@ -110,14 +110,20 @@ function Taxonomy() {
   const [isLoading, setIsLoading] = useState(false)
   const [openSnackbar, setOpenSnackbar] = useState(false)
   
-  // const registerImageExecutor = useOperatorExecutor("@voxel51/taxonomy_plugin/register_images");
   const registerImageExecutor = useOperatorExecutor("@voxel51/taxonomy_plugin/register_images");
+  const isCompleted = registerImageExecutor.result?.isCompleted || -1;
 
   useEffect(() => {
     ;(async () => {
       await fetchTaxonomyData()
     })()
   }, [])
+
+  useEffect(() => {
+    if (registerImageExecutor.result?.isCompleted === 1) {
+      setIsLoading(false)      
+    }
+  }, [isCompleted])
 
   const fetchTaxonomyData = async () => {
     const items1 = [] as TaxonomyItem[]
@@ -167,7 +173,7 @@ function Taxonomy() {
   const onSelectedItemsChange3 = (event: SyntheticEvent, ids: string[]) => setSourceDataTraverseTree(ids, treeItems3, 3)
 
   const onChangeText = (event: React.ChangeEvent<HTMLTextAreaElement>) => setSearchText(event.target.value)
-
+  
   const onClickSearch = async () => {
     setIsLoading(true)
     const concatTaxonomies = _.concat(selectedTaxonomies1, selectedTaxonomies2, selectedTaxonomies3)
@@ -181,13 +187,12 @@ function Taxonomy() {
       formData.append('tags', JSON.stringify(concatTaxonomies))
       formData.append('targetTableForTags', 'tag_table_EmbeddedImages_v6_Updated_NT_2')
       const response = await httpClient.post('/v1/searchByTaxonomyv2', formData)
-      // setImages(response.data.searchedSimilarImages)
 
-      // display the number of images found int the Sample panel
+      if (registerImageExecutor.result) {
+        registerImageExecutor.result.isCompleted = -1;
+      }
       registerImageExecutor.execute({ images: response.data.searchedSimilarImages.map((image: any) => image.sas_url) })      
-
-      setOpenSnackbar(true)
-    } finally {
+    } catch (error) {
       setIsLoading(false)
     }
   }

@@ -20,7 +20,7 @@ class RegisterImagesOperator(foo.Operator):
     def resolve_input(self, ctx):
         pass
 
-    def execute(self, ctx):     
+    def execute(self, ctx):
         # 画像を一時保存する任意のディレクトリパス
         target_directory = ""
         if not os.path.isdir(self.home_directory):
@@ -28,12 +28,15 @@ class RegisterImagesOperator(foo.Operator):
             self.home_directory = "/home/ichikawa" 
         
         target_directory = self.home_directory + "/ces/images"                      
-        os.makedirs(target_directory, exist_ok=True)
-               
-        ctx.dataset.clear()
-        # ctx.dataset.delete()
+        for file in os.listdir(target_directory):
+            os.remove(os.path.join(target_directory, file))
+        
+        os.makedirs(target_directory, exist_ok=True)        
+        ctx.dataset.clear()   
+        ctx.trigger("reload_dataset")      
+        
         images = ctx.params.get("images", None)
-        new_samples = []
+        count = 1
         for image_url in images:
             response = requests.get(image_url)
             if response.status_code == 200:
@@ -44,15 +47,19 @@ class RegisterImagesOperator(foo.Operator):
                 image_path = os.path.join(target_directory, image_name)
                 with open(image_path, 'wb') as f:
                     f.write(response.content)
-                sample = fo.Sample(filepath=image_path)
-                # 画像にタグ付け
-                # sample.tags.append("sunny")
-                
-                ctx.dataset.add_samples([sample])
+                sample = fo.Sample(filepath=image_path)                                
+                ctx.dataset.add_samples([sample]) 
             else:
                 # with open('/home/ichikawa/ces/failed-images.txt', 'w') as file:
                 with open('~/ces/failed-images.txt', 'w') as file:
                     print(f"Failed to download {image_url}")
+   
+        
+        # 画像の登録が完了したら、データセットをリロードする
+        ctx.ops.reload_dataset()
+        ctx.ops.notify("Images have been updated successfully.")   
+          
+        return {"isCompleted": 1}
 
     def resolve_output(self, ctx):
         pass
