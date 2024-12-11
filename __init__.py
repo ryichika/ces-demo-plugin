@@ -25,7 +25,7 @@ class RegisterImagesOperator(foo.Operator):
         target_directory = ""
         if not os.path.isdir(self.home_directory):
             # ローカル環境用
-            self.home_directory = "/home/ichikawa" 
+            self.home_directory = "/home/Ichikawa" 
         
         target_directory = self.home_directory + "/ces/images"                      
         for file in os.listdir(target_directory):
