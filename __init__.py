@@ -34,21 +34,21 @@ class RegisterImagesOperator(foo.Operator):
                 
         images = ctx.params.get("images", None)
         if len(images) > 0:
-            ctx.dataset.clear()
-            for image_url in images:
-                response = requests.get(image_url)
-                if response.status_code == 200:
-                    parsed_url = urlparse(image_url)
-                    image_name = os.path.basename(parsed_url.path)
-                    # URLエンコードされた文字をデコード
-                    image_name = unquote(image_name)    
-                    image_path = os.path.join(target_directory, image_name)
-                    with open(image_path, 'wb') as f:
-                        f.write(response.content)
-                    sample = fo.Sample(filepath=image_path)                                
-                    ctx.dataset.add_samples([sample]) 
-            
             try:
+                ctx.dataset.clear()
+                for image_url in images:
+                    response = requests.get(image_url)
+                    if response.status_code == 200:
+                        parsed_url = urlparse(image_url)
+                        image_name = os.path.basename(parsed_url.path)
+                        # URLエンコードされた文字をデコード
+                        image_name = unquote(image_name)    
+                        image_path = os.path.join(target_directory, image_name)
+                        with open(image_path, 'wb') as f:
+                            f.write(response.content)
+                        sample = fo.Sample(filepath=image_path)                                
+                        ctx.dataset.add_samples([sample]) 
+                       
                 # 画像の登録が完了したら、データセットをリロードする
                 ctx.ops.reload_dataset()
                 ctx.ops.notify("Images have been updated successfully.")   
