@@ -48,9 +48,14 @@ class RegisterImagesOperator(foo.Operator):
                     sample = fo.Sample(filepath=image_path)                                
                     ctx.dataset.add_samples([sample]) 
             
-            # 画像の登録が完了したら、データセットをリロードする
-            ctx.ops.reload_dataset()
-            ctx.ops.notify("Images have been updated successfully.")   
+            try:
+                # 画像の登録が完了したら、データセットをリロードする
+                ctx.ops.reload_dataset()
+                ctx.ops.notify("Images have been updated successfully.")   
+            except Exception as e:
+                with open(f"{self.target_directory}/ces/error.log", 'w') as file:
+                    file.write(str(e) + "\n")
+                ctx.ops.notify("Failed to update images.")
           
         return {"isCompleted": 1}
 
