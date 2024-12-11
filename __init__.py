@@ -7,8 +7,6 @@ import fiftyone.operators.types as types
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
 class RegisterImagesOperator(foo.Operator):
-    home_directory = "/home/microsoft"
-    
     @property
     def config(self):
         return foo.OperatorConfig(
@@ -22,14 +20,9 @@ class RegisterImagesOperator(foo.Operator):
 
     def execute(self, ctx):
         # 画像を一時保存する任意のディレクトリパス
-        target_directory = ""
-        if not os.path.isdir(self.home_directory):
-            # ローカル環境用
-            self.home_directory = "/home/Ichikawa" 
-        
-        target_directory = self.home_directory + "/ces/images"                      
-        for file in os.listdir(target_directory):
-            os.remove(os.path.join(target_directory, file))        
+        target_directory = f"{os.environ.get('HOME')}/ces/images"
+        # for file in os.listdir(target_directory):
+        #     os.remove(os.path.join(target_directory, file))        
         os.makedirs(target_directory, exist_ok=True)        
                 
         images = ctx.params.get("images", None)
@@ -37,19 +30,22 @@ class RegisterImagesOperator(foo.Operator):
             try:
                 ctx.dataset.clear()
                 for image_url in images:
-                    response = requests.get(image_url)
-                    if response.status_code == 200:
-                        parsed_url = urlparse(image_url)
-                        image_name = os.path.basename(parsed_url.path)
-                        # URLエンコードされた文字をデコード
-                        image_name = unquote(image_name)    
-                        image_path = os.path.join(target_directory, image_name)
-                        with open(image_path, 'wb') as f:
-                            f.write(response.content)
+                    parsed_url = urlparse(image_url)
+                    image_name = os.path.basename(parsed_url.path)
+                    image_path = os.path.join(target_directory, image_name)
+                    if not os.path.exists(image_path):
+                        response = requests.get(image_url)
+                        if response.status_code == 200:
+                            with open(image_path, 'wb') as f:
+                                f.write(response.content)
+                            sample = fo.Sample(filepath=image_path)                                
+                            ctx.dataset.add_samples([sample]) 
+                    else:
                         sample = fo.Sample(filepath=image_path)                                
-                        ctx.dataset.add_samples([sample]) 
+                        ctx.dataset.add_samples([sample])
                        
                 # 画像の登録が完了したら、データセットをリロードする
+                # ctx.dataset.persistent = True
                 ctx.ops.reload_dataset()
                 ctx.ops.notify("Images have been updated successfully.")   
             except Exception as e:
@@ -80,7 +76,7 @@ class HelloWorldPanel(foo.Panel):
         ctx.ops.notify(ctx.panel.state.hello_message)
 
         sample1 = fo.Sample(
-            filepath="/home/ichikawa/ces/001281.jpg",
+            filepath=f"{os.environ.get('HOME')}/ces/001281.jpg",
             ground_truth=fo.Detections(
                 detections=[
                     fo.Detection(

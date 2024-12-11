@@ -26,7 +26,7 @@ const Container = styled.div`
   padding: 20px 0;
   display: flex;
   justify-content: center;
-  height: calc(100dvh - 290px);
+  height: calc(100dvh - 220px);
 `
 
 const DetailPanelContent = styled.div`
@@ -53,7 +53,7 @@ const DetailPanelContentTreeBoxHeader = styled.div`
 
 const DetailPanelContentTreeBoxBody = styled.div`
   overflow-y: auto;
-  height: calc(100% - 120px);
+  height: calc(100% - 50px);
 
   &::-webkit-scrollbar {
     background: rgba(0, 0, 0, 0.2);
@@ -77,7 +77,7 @@ const DetailPanelContentTreeBoxes = styled.div`
 const DetailPanelContentTreeBox = styled.div`
   width: 32.8%;
   overflow-y: hidden;
-  height: calc(100vh - 320px);
+  height: calc(100vh - 330px);
 `
 
 const TextFieldBox = styled.div`
@@ -334,7 +334,7 @@ function Taxonomy() {
 
       {/* <Divider style={{ marginTop: '20px' }}></Divider> */}
 
-      <SearchedImageList images={images}></SearchedImageList>
+      {/* <SearchedImageList images={images}></SearchedImageList> */}
 
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
