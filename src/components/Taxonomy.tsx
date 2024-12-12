@@ -6,6 +6,7 @@ import { useRecoilState, useRecoilValue } from 'recoil'
 import { colors, Typography, Button, Divider } from '@mui/material'
 import CircularProgress from '@mui/material/CircularProgress'
 import SearchIcon from '@mui/icons-material/Search'
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView'
 import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 // fiftyone
@@ -110,6 +111,7 @@ function Taxonomy() {
   const [isLoading, setIsLoading] = useState(false)
   const [openSnackbar, setOpenSnackbar] = useState(false)
   
+  const testExecutor = useOperatorExecutor("@voxel51/taxonomy_plugin/test_temp");
   const registerImageExecutor = useOperatorExecutor("@voxel51/taxonomy_plugin/register_images");
   const isCompleted = registerImageExecutor.result?.isCompleted || -1;
 
@@ -197,6 +199,10 @@ function Taxonomy() {
     } catch (error) {
       setIsLoading(false)
     }
+  }
+
+  const onClickTest = async () => {
+    testExecutor.execute()
   }
 
   // Test Code (Python Operator)
@@ -330,6 +336,15 @@ function Taxonomy() {
           onClick={onClickSearch}
         >
           <span>Search</span>
+        </Button>
+
+        <Button
+          variant="outlined"
+          startIcon={<RestartAltIcon />}
+          style={{ width: '100px', border: '1px solid white', marginLeft: "10px", color: 'white', display: !isLoading ? 'inherit' : 'none' }}
+          onClick={onClickTest}
+        >
+          <span>Update</span>
         </Button>
         <CircularProgress style={{ display: isLoading ? 'block' : 'none' }} />
       </ActionBox>

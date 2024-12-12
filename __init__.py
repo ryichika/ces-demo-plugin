@@ -58,6 +58,24 @@ class RegisterImagesOperator(foo.Operator):
 
     def resolve_output(self, ctx):
         pass
+    
+class TestOperator(foo.Operator):
+    @property
+    def config(self):
+        return foo.OperatorConfig(
+            name="test_temp",
+            label="Test (temp)",
+            dynamic=True,
+        )
+
+    def resolve_input(self, ctx):
+        pass
+
+    def execute(self, ctx):
+        ctx.ops.reload_dataset()
+        
+    def resolve_output(self, ctx):
+        pass    
 
 class HelloWorldPanel(foo.Panel):
     selected_ids = []
@@ -149,4 +167,5 @@ class HelloWorldPanel(foo.Panel):
 
 def register(p):
     p.register(RegisterImagesOperator)
+    p.register(TestOperator)
     p.register(HelloWorldPanel)
