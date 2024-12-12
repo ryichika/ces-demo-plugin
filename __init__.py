@@ -51,7 +51,7 @@ class RegisterImagesOperator(foo.Operator):
                 with open(f"{self.target_directory}/ces/error.log", 'w') as file:
                     file.write(str(e) + "\n")
                 ctx.ops.notify("Failed to update images.")
-        else
+        else:
             ctx.ops.notify("No images to update.")
           
         return {"isCompleted": 1}
