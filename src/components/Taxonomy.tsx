@@ -184,7 +184,9 @@ function Taxonomy() {
       formData.append('endDate', '')
       formData.append('text', searchText)
       formData.append('targetTableForText', 'EmbeddedImages_v6')
-      formData.append('tags', JSON.stringify(concatTaxonomies))
+      if(concatTaxonomies.length > 0) {
+        formData.append('tags', JSON.stringify(concatTaxonomies))
+      }
       formData.append('targetTableForTags', 'tag_table_EmbeddedImages_v6_Updated_NT_2')
       const response = await httpClient.post('/v1/searchByTaxonomyv2', formData)
 

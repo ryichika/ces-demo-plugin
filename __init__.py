@@ -45,7 +45,6 @@ class RegisterImagesOperator(foo.Operator):
                         ctx.dataset.add_samples([sample])
                        
                 # 画像の登録が完了したら、データセットをリロードする
-                # ctx.dataset.persistent = True
                 ctx.ops.reload_dataset()
                 ctx.ops.notify("Images have been updated successfully.")   
             except Exception as e:
