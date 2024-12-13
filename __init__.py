@@ -1,10 +1,11 @@
 import os
 import requests
-from urllib.parse import urlparse, unquote
+from urllib.parse import urlparse
+from logging import getLogger, FileHandler, DEBUG, ERROR
 import fiftyone as fo
 import fiftyone.operators as foo
 import fiftyone.operators.types as types
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
+from azure.storage.blob import BlobServiceClient
 
 class RegisterImagesOperator(foo.Operator):
     @property
@@ -21,8 +22,6 @@ class RegisterImagesOperator(foo.Operator):
     def execute(self, ctx):
         # 画像を一時保存する任意のディレクトリパス
         target_directory = f"{os.environ.get('HOME')}/ces/images"
-        # for file in os.listdir(target_directory):
-        #     os.remove(os.path.join(target_directory, file))        
         os.makedirs(target_directory, exist_ok=True)        
                 
         images = ctx.params.get("images", None)
@@ -48,8 +47,7 @@ class RegisterImagesOperator(foo.Operator):
                 ctx.ops.reload_dataset()
                 ctx.ops.notify("Images have been updated successfully.")   
             except Exception as e:
-                with open(f"{self.target_directory}/ces/error.log", 'w') as file:
-                    file.write(str(e) + "\n")
+                log_exception(str(e))                
                 ctx.ops.notify("Failed to update images.")
         else:
             ctx.ops.notify("No images to update.")
@@ -59,21 +57,27 @@ class RegisterImagesOperator(foo.Operator):
     def resolve_output(self, ctx):
         pass
     
-class TestOperator(foo.Operator):
+class ReloadDatasetOperator(foo.Operator):
     @property
     def config(self):
         return foo.OperatorConfig(
-            name="test_temp",
-            label="Test (temp)",
+            name="reload_dataset",
+            label="Reload dataset",
             dynamic=True,
         )
 
     def resolve_input(self, ctx):
         pass
 
-    def execute(self, ctx):
+    def execute(self, ctx):        
         ctx.ops.reload_dataset()
+        # JS Pluginのshow_messageメソッドを呼び出す
+        # self.show_message(ctx)
         
+    # JS Pluginのshow_messageメソッドを呼び出す
+    def show_message(self, ctx):
+        return ctx.trigger(f"@voxel51/taxonomy_plugin/show_message")
+
     def resolve_output(self, ctx):
         pass    
 
@@ -163,9 +167,22 @@ class HelloWorldPanel(foo.Panel):
         # )
 
         return types.Property(panel)
-    
+
+def log_debug(debug_message):
+    logger = getLogger(__name__)
+    logger.setLevel(DEBUG)
+    handler = FileHandler(f"{os.environ.get('HOME')}/ces/debug.log")
+    logger.addHandler(handler)
+    logger.info(debug_message)
+
+def log_exception(exception_message):
+    logger = getLogger(__name__)
+    handler = FileHandler(f"{os.environ.get('HOME')}/ces/error.log")
+    handler.setLevel(ERROR)
+    logger.addHandler(handler)
+    logger.error(str(exception_message))        
 
 def register(p):
     p.register(RegisterImagesOperator)
-    p.register(TestOperator)
+    p.register(ReloadDatasetOperator)
     p.register(HelloWorldPanel)

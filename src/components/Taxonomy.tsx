@@ -12,10 +12,10 @@ import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 // fiftyone
 import { registerOperator, useOperatorExecutor } from '@fiftyone/operators'
 import { TaxonomyOperator } from '@/operators/TaxonomyOperator'
+import { ShowMessageOperator } from '@/operators/ShowMessageOperator'
 import * as fos from '@fiftyone/state'
 // components
 import { CustomTreeItem } from './CustomTreeItem'
-import { SearchedImageList } from './SearchedImageList'
 import { TaxonomyItem, TaxonomyData } from '@/types/type'
 import styled from 'styled-components'
 // etc
@@ -111,7 +111,7 @@ function Taxonomy() {
   const [isLoading, setIsLoading] = useState(false)
   const [openSnackbar, setOpenSnackbar] = useState(false)
   
-  const testExecutor = useOperatorExecutor("@voxel51/taxonomy_plugin/test_temp");
+  const reloadExecutor = useOperatorExecutor("@voxel51/taxonomy_plugin/reload_dataset");
   const registerImageExecutor = useOperatorExecutor("@voxel51/taxonomy_plugin/register_images");
   const isCompleted = registerImageExecutor.result?.isCompleted || -1;
 
@@ -201,15 +201,7 @@ function Taxonomy() {
     }
   }
 
-  const onClickTest = async () => {
-    testExecutor.execute()
-  }
-
-  // Test Code (Python Operator)
-  // const count = searchExecutor.result?.count || -1;
-  // const onClickCount = () => {
-  //   searchExecutor.execute();
-  // };
+  const onClickReload = async () => reloadExecutor.execute()
 
   return (
     <React.StrictMode>
@@ -342,16 +334,12 @@ function Taxonomy() {
           variant="outlined"
           startIcon={<RestartAltIcon />}
           style={{ width: '100px', border: '1px solid white', marginLeft: "10px", color: 'white', display: !isLoading ? 'inherit' : 'none' }}
-          onClick={onClickTest}
+          onClick={onClickReload}
         >
           <span>Update</span>
         </Button>
         <CircularProgress style={{ display: isLoading ? 'block' : 'none' }} />
       </ActionBox>
-
-      {/* <Divider style={{ marginTop: '20px' }}></Divider> */}
-
-      {/* <SearchedImageList images={images}></SearchedImageList> */}
 
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
@@ -366,3 +354,4 @@ function Taxonomy() {
 export default Taxonomy
 
 registerOperator(TaxonomyOperator, '@voxel51/taxonomy_plugin')
+registerOperator(ShowMessageOperator, '@voxel51/taxonomy_plugin')

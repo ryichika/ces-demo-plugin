@@ -8,6 +8,7 @@ license: Apache 2.0
 operators:
   - create_taxonomy
   - register_images
-  - test_temp
+  - reload_dataset
+  - show_message
 panels:
   - hello_world_panel
