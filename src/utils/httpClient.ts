@@ -1,9 +1,10 @@
 import axios from "axios";
 
 const httpClient = axios.create({
-  withCredentials: true,
-  //baseURL: `${process.env.REACT_APP_API_BASE_URL}`,
-  baseURL: "https://av-dataops-azapp-metadata-dev-001.azurewebsites.net",
+  withCredentials: false,
+  // baseURL: `${process.env.REACT_APP_API_BASE_URL}`,
+  // baseURL: "https://av-dataops-azapp-metadata-dev-001.azurewebsites.net",
+  baseURL: "https://av-dataops-azapp-metadata-ces-001-hfgvcrc9a2hmgtcz.westus2-01.azurewebsites.net",
   headers: {
     Accept: "application/json",    
   },
