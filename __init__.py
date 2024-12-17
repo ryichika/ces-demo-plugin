@@ -46,25 +46,17 @@ class RegisterImagesOperator(foo.Operator):
                             # タグ追加
                             sample.tags.append(taxonomies[count])                            
                             # ラベル追加
-                            sample["ground_truth"] = fo.Classifications(
-                                classifications=[
-                                    fo.Classification(label=categories[count]),
-                                    fo.Classification(label=taxonomies[count]),
-                                ]
-                            )
+                            sample["category"] = fo.Classification(label=categories[count])
+                            sample["taxonomy"] = fo.Classification(label=taxonomies[count])
                             ctx.dataset.add_samples([sample]) 
                     else:
                         sample = fo.Sample(filepath=image_path)  
                         # タグ追加
                         sample.tags.append(taxonomies[count])
                         # ラベル追加
-                        sample["ground_truth"] = fo.Classifications(
-                            classifications=[
-                                fo.Classification(label=categories[count]),
-                                fo.Classification(label=taxonomies[count]),
-                            ]
-                        )
-                        # BBox追加
+                        sample["category"] = fo.Classification(label=categories[count])
+                        sample["taxonomy"] = fo.Classification(label=taxonomies[count])
+                        # バウンディングボックス追加
                         # sample["ground_truth"] = fo.Detections(detections=[fo.Detection(label=Taxonomies[count], bounding_box=[0.5, 0.5, 0.4, 0.3])])
                         ctx.dataset.add_samples([sample])
                     count += 1
