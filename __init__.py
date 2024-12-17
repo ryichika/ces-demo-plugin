@@ -25,23 +25,49 @@ class RegisterImagesOperator(foo.Operator):
         os.makedirs(target_directory, exist_ok=True)        
                 
         images = ctx.params.get("images", None)
+        categories = ctx.params.get("categories", None)
+        taxonomies = ctx.params.get("Taxonomies", None)
         if len(images) > 0:
             try:
                 ctx.dataset.clear()
+                count = 0
                 for image_url in images:
                     parsed_url = urlparse(image_url)
                     image_name = os.path.basename(parsed_url.path)
                     image_path = os.path.join(target_directory, image_name)
+                    # キャッシュの有無確認
                     if not os.path.exists(image_path):
                         response = requests.get(image_url)
                         if response.status_code == 200:
                             with open(image_path, 'wb') as f:
                                 f.write(response.content)
-                            sample = fo.Sample(filepath=image_path)                                
+                                
+                            sample = fo.Sample(filepath=image_path)
+                            # タグ追加
+                            sample.tags.append(taxonomies[count])                            
+                            # ラベル追加
+                            sample["ground_truth"] = fo.Classifications(
+                                classifications=[
+                                    fo.Classification(label=categories[count]),
+                                    fo.Classification(label=taxonomies[count]),
+                                ]
+                            )
                             ctx.dataset.add_samples([sample]) 
                     else:
-                        sample = fo.Sample(filepath=image_path)                                
+                        sample = fo.Sample(filepath=image_path)  
+                        # タグ追加
+                        sample.tags.append(taxonomies[count])
+                        # ラベル追加
+                        sample["ground_truth"] = fo.Classifications(
+                            classifications=[
+                                fo.Classification(label=categories[count]),
+                                fo.Classification(label=taxonomies[count]),
+                            ]
+                        )
+                        # BBox追加
+                        # sample["ground_truth"] = fo.Detections(detections=[fo.Detection(label=Taxonomies[count], bounding_box=[0.5, 0.5, 0.4, 0.3])])
                         ctx.dataset.add_samples([sample])
+                    count += 1
                        
                 # 画像の登録が完了したら、データセットをリロードする
                 ctx.ops.reload_dataset()

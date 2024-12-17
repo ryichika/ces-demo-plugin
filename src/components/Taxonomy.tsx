@@ -195,7 +195,11 @@ function Taxonomy() {
       if (registerImageExecutor.result) {
         registerImageExecutor.result.isCompleted = -1;
       }
-      registerImageExecutor.execute({ images: response.data.searchedSimilarImages.map((image: any) => image.sas_url) })      
+      registerImageExecutor.execute({ 
+        images: response.data.searchedSimilarImages.map((image: any) => image.sas_url),
+        categories: response.data.searchedSimilarImages.map((image: any) => image.category),
+        Taxonomies: response.data.searchedSimilarImages.map((image: any) => image.taxonomy) ,
+      })
     } catch (error) {
       setIsLoading(false)
     }
